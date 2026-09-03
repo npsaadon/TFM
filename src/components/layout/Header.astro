@@ -1,0 +1,152 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@components/ui/Icon.astro';
+import Button from '@components/ui/Button.astro';
+import UtilityBar from './UtilityBar.astro';
+import { nav, site } from '@data/site';
+import logo from '@assets/images/TFM-Logo-Outline.png';
+
+/** Trailing-slash-insensitive match, so `/about` and `/about/` both highlight. */
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (href: string) => (href.replace(/\/+$/, '') || '/') === path;
+---
+
+<UtilityBar />
+
+<header
+  class="sticky top-0 z-50 border-b border-line bg-white/95 shadow-[0_1px_0_rgba(30,34,38,0.04)] backdrop-blur-sm"
+>
+  <div class="container-tfm">
+    {/* Three columns rather than `justify-between`: with a narrow logo on one
+        side and a wide button on the other, spreading three items leaves the
+        nav sitting left of centre with an odd gap beside it. Equal outer
+        columns put the nav on the page's true centre line. */}
+    <div
+      class="flex items-center justify-between gap-6 py-3
+             lg:grid lg:grid-cols-[1fr_auto_1fr] lg:py-4"
+    >
+      <a
+        href="/"
+        class="shrink-0 justify-self-start"
+        aria-label={`${site.name} — home`}
+        aria-current={path === '/' ? 'page' : undefined}
+      >
+        <Image
+          src={logo}
+          alt={`${site.name} logo`}
+          width={300}
+          widths={[150, 300]}
+          sizes="150px"
+          class="h-16 w-auto lg:h-[4.5rem]"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </a>
+
+      <nav aria-label="Main" class="hidden lg:block">
+        <ul class="flex items-center gap-1">
+          {
+            nav.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={isCurrent(item.href) ? 'page' : undefined}
+                  class:list={[
+                    'relative block px-5 py-2.5 font-display text-[0.9375rem] font-medium uppercase tracking-wide transition-colors duration-200 ' +
+                    // Sliding underline, drawn only on non-active items.
+                    'after:absolute after:inset-x-5 after:bottom-1 after:h-0.5 after:origin-left after:scale-x-0 after:bg-brand after:transition-transform after:duration-250 hover:after:scale-x-100',
+                    isCurrent(item.href)
+                      ? 'rounded-(--radius-control) bg-brand text-white after:hidden'
+                      : 'text-ink hover:text-brand',
+                  ]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="hidden lg:block lg:justify-self-end">
+        <Button href="/contact/">Get Started</Button>
+      </div>
+
+      <button
+        type="button"
+        id="menu-toggle"
+        class="-mr-2 inline-flex items-center justify-center p-2.5 text-ink lg:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label="Open menu"
+      >
+        <Icon name="menu" size={28} class="block" id="menu-open-icon" />
+        <Icon name="close" size={28} class="hidden" id="menu-close-icon" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu. Hidden from assistive tech while collapsed, not just visually. -->
+  <div id="mobile-menu" hidden class="border-t border-line bg-white lg:hidden">
+    <nav aria-label="Mobile" class="container-tfm py-4">
+      <ul class="flex flex-col">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+                class:list={[
+                  'block border-b border-line/70 py-3.5 font-display text-lg uppercase tracking-wide transition-colors',
+                  isCurrent(item.href) ? 'text-brand' : 'text-ink hover:text-brand',
+                ]}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="pt-5">
+        <Button href="/contact/" class="w-full">Get Started</Button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+  const openIcon = document.getElementById('menu-open-icon');
+  const closeIcon = document.getElementById('menu-close-icon');
+
+  if (toggle && menu && openIcon && closeIcon) {
+    const setOpen = (open: boolean) => {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      openIcon.classList.toggle('hidden', open);
+      openIcon.classList.toggle('block', !open);
+      closeIcon.classList.toggle('hidden', !open);
+      closeIcon.classList.toggle('block', open);
+    };
+
+    toggle.addEventListener('click', () => setOpen(menu.hidden));
+
+    // Escape closes the menu and returns focus to the control that opened it,
+    // so keyboard users are never stranded inside a collapsed panel.
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !menu.hidden) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Collapse when the viewport grows past the breakpoint, otherwise the menu
+    // can stay "open" invisibly and trap focus on desktop.
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    desktop.addEventListener('change', (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+</script>

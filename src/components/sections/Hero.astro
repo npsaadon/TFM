@@ -1,0 +1,153 @@
+---
+import { Image } from 'astro:assets';
+import Headline from '@components/ui/Headline.astro';
+import Button from '@components/ui/Button.astro';
+import Icon from '@components/ui/Icon.astro';
+import { hero } from '@data/home';
+
+/**
+ * The opening frame: one sharp photograph of the Lansdale facility, with a
+ * short orchestrated entrance and a gentle scroll parallax.
+ *
+ * Motion rules:
+ *  - The entrance is CSS-only — content is present and correct without JS.
+ *  - Parallax is a transform on the photo's wrapper, driven by rAF; the photo
+ *    is drawn 130% tall so movement never exposes an edge.
+ *  - Everything collapses to a still under prefers-reduced-motion.
+ */
+---
+
+<section class="relative isolate flex min-h-[max(34rem,88svh)] items-center overflow-hidden">
+  <div id="hero-parallax" class="absolute inset-0 -z-20 will-change-transform">
+    <Image
+      src={hero.image}
+      alt={hero.imageAlt}
+      width={1920}
+      widths={[768, 1280, 1920, 2560]}
+      quality={70}
+      sizes="100vw"
+      class="hero-zoom absolute left-0 top-[-15%] h-[130%] w-full object-cover object-[center_58%]"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </div>
+
+  <div
+    class="absolute inset-0 -z-10 bg-linear-to-r from-ink/88 via-ink/60 to-ink/20"
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class="absolute inset-0 -z-10 bg-linear-to-b from-ink/45 via-transparent to-ink/65"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="container-tfm relative w-full py-24 lg:py-32">
+    <div class="max-w-3xl">
+      <div class="hero-in mb-7 flex items-center gap-4" style="--in-delay: 80ms">
+        <span class="laminate laminate-on-dark" aria-hidden="true"></span>
+        <p class="font-display text-sm font-semibold uppercase tracking-[0.14em] text-white/80">
+          U.S. foam &amp; mattress manufacturing — Lansdale, PA
+        </p>
+      </div>
+
+      <div class="hero-in" style="--in-delay: 220ms">
+        <Headline
+          html={hero.headlineHtml}
+          as="h1"
+          size="display"
+          onDark
+          class="[&>em]:text-brand"
+        />
+      </div>
+
+      <div class="hero-in mt-10 flex flex-wrap items-center gap-x-8 gap-y-4" style="--in-delay: 420ms">
+        <Button href={hero.cta.href} size="lg">
+          {hero.cta.label}
+          <Icon name="arrow-right" size={18} class="transition-transform duration-200 group-hover:translate-x-1" />
+        </Button>
+        <a
+          href="/private-label/"
+          class="group inline-flex items-center gap-2.5 font-display text-base font-semibold uppercase
+                 tracking-wide text-white transition-colors hover:text-brand"
+        >
+          Private label programs
+          <Icon
+            name="arrow-right"
+            size={17}
+            class="transition-transform duration-200 group-hover:translate-x-1"
+          />
+        </a>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<style>
+  /* Entrance: rise-and-fade with a per-element delay. Runs only when motion is
+     allowed; otherwise everything simply sits in place. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-in {
+      opacity: 0;
+      animation: hero-rise 0.9s var(--ease-out-soft) forwards;
+      animation-delay: var(--in-delay, 0ms);
+    }
+
+    @keyframes hero-rise {
+      from {
+        opacity: 0;
+        transform: translateY(1.75rem);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* A slow settle on the photograph, from slightly zoomed to rest. */
+    .hero-zoom {
+      animation: hero-settle 2.2s var(--ease-out-soft) both;
+    }
+
+    @keyframes hero-settle {
+      from {
+        transform: scale(1.08);
+      }
+      to {
+        transform: scale(1);
+      }
+    }
+  }
+</style>
+
+<script>
+  /**
+   * Parallax: the photo wrapper drifts at ~22% of scroll speed while the hero
+   * is on screen, which reads as depth between the photograph and the page.
+   * Transform-only (compositor work, no layout), capped to the hero's own
+   * height, and skipped entirely under prefers-reduced-motion.
+   */
+  const wrapper = document.getElementById('hero-parallax');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (wrapper && !reduced) {
+    let ticking = false;
+    const update = () => {
+      const y = Math.min(window.scrollY, window.innerHeight);
+      wrapper.style.transform = `translateY(${(y * 0.22).toFixed(1)}px)`;
+      ticking = false;
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true }
+    );
+  }
+</script>

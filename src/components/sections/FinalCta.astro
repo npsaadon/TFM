@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import Headline from '@components/ui/Headline.astro';
+import SectionMark from '@components/ui/SectionMark.astro';
+import Button from '@components/ui/Button.astro';
+import Icon from '@components/ui/Icon.astro';
+import { finalCta } from '@data/home';
+---
+
+<section class="grain relative isolate section overflow-hidden">
+  <Image
+    src={finalCta.background}
+    alt=""
+    width={1920}
+    widths={[1024, 1600, 1920]}
+    quality={55}
+    sizes="100vw"
+    class="bg-drift absolute inset-0 -z-20 size-full object-cover [filter:grayscale(45%)]"
+    loading="eager"
+          decoding="async"
+    aria-hidden="true"
+  />
+  {/* Same duotone recipe as "The TFM Difference", so the page's dark bands
+      read as one system. The background is the aerial that used to open the
+      page — 1082px is too soft for a hero but fine under this much overlay. */}
+  <div class="absolute inset-0 -z-10 bg-navy mix-blend-multiply" aria-hidden="true"></div>
+  <div class="absolute inset-0 -z-10 bg-navy/55" aria-hidden="true"></div>
+
+  <div class="container-tfm relative">
+    <div class="mx-auto max-w-3xl" data-reveal>
+      <SectionMark label={finalCta.eyebrow} onDark align="center" />
+      <Headline
+        html={finalCta.headlineHtml}
+        as="h2"
+        size="h2"
+        onDark
+        class="mt-5 text-center"
+      />
+      <p class="mt-7 text-center text-white/80">{finalCta.body}</p>
+      <div class="mt-10">
+        <Button href={finalCta.cta.href} size="lg">
+          {finalCta.cta.label}
+          <Icon
+            name="arrow-right"
+            size={18}
+            class="transition-transform duration-200 group-hover:translate-x-1"
+          />
+        </Button>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import Headline from '@components/ui/Headline.astro';
+import SectionMark from '@components/ui/SectionMark.astro';
+import Button from '@components/ui/Button.astro';
+import Icon from '@components/ui/Icon.astro';
+import { privateLabelBanner } from '@data/home';
+
+/**
+ * The private label pitch, executed the way the original did it: a light split
+ * with the layered mattress cutaway on the right. The cutaway earns its place —
+ * comfort layer, transition, support core — it is the product actually being
+ * offered, and it is the laminate motif made literal. (A dark truck-yard
+ * version was tried and rejected; the copy stays from that pass.)
+ */
+---
+
+<section class="section overflow-hidden bg-white">
+  <div class="container-tfm">
+    <div class="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+      <div data-reveal="left">
+        <SectionMark label="Private label" />
+        <Headline html={privateLabelBanner.headline} as="h2" size="h2" class="mt-5" />
+        <p class="mt-6">{privateLabelBanner.body}</p>
+        <div class="mt-9">
+          <Button href={privateLabelBanner.cta.href} size="lg">
+            {privateLabelBanner.cta.label}
+            <Icon
+              name="arrow-right"
+              size={18}
+              class="transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </Button>
+        </div>
+      </div>
+
+      <div data-reveal="right" style="--reveal-delay:120ms">
+        <Image
+          src={privateLabelBanner.image}
+          alt={privateLabelBanner.imageAlt}
+          width={1024}
+          widths={[512, 768, 1024]}
+          quality={78}
+          sizes="(min-width: 1024px) 45vw, 92vw"
+          class="h-auto w-full"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,63 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+/**
+ * The banner at the top of every inner page.
+ *
+ * Each page supplies a photograph, tinted with the same navy-duotone recipe as
+ * the homepage's dark bands, so the whole site shares one treatment. The title
+ * stays left-aligned over the laminate mark — the live site centres its title
+ * over the photo, which reads as a template header; anchored left it reads as
+ * a chapter heading.
+ */
+
+interface Props {
+  title: string;
+  breadcrumb: string;
+  image: ImageMetadata;
+  /** CSS object-position — lets each page choose which part of its photo the
+   *  banner crop keeps (e.g. 'center 72%' to hold the lower part in frame). */
+  imagePosition?: string;
+}
+
+const { title, breadcrumb, image, imagePosition = 'center' } = Astro.props;
+---
+
+<section class="grain relative isolate overflow-hidden bg-ink">
+  <Image
+    src={image}
+    alt=""
+    width={1920}
+    widths={[960, 1440, 1920]}
+    quality={55}
+    sizes="100vw"
+    class="bg-drift absolute inset-0 -z-20 size-full object-cover [filter:grayscale(20%)]"
+    style={`object-position: ${imagePosition}`}
+    loading="eager"
+    fetchpriority="high"
+    decoding="async"
+    aria-hidden="true"
+  />
+  <div class="absolute inset-0 -z-10 bg-navy/60 mix-blend-multiply" aria-hidden="true"></div>
+  <div
+    class="absolute inset-0 -z-10 bg-linear-to-r from-ink/85 via-ink/40 to-transparent"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="container-tfm relative py-20 lg:py-32">
+    <span class="laminate laminate-on-dark mb-6" aria-hidden="true"></span>
+    <h1 class="headline headline-on-dark text-h1">{title}</h1>
+
+    <nav aria-label="Breadcrumb" class="mt-4">
+      <ol class="flex flex-wrap items-center gap-2 text-sm text-white/60">
+        <li>
+          <a href="/" class="transition-colors hover:text-white">Home</a>
+        </li>
+        <li aria-hidden="true" class="text-white/30">/</li>
+        <li aria-current="page" class="text-white">{breadcrumb}</li>
+      </ol>
+    </nav>
+  </div>
+</section>

@@ -1,0 +1,89 @@
+---
+import { Image } from 'astro:assets';
+import Headline from '@components/ui/Headline.astro';
+import SectionMark from '@components/ui/SectionMark.astro';
+import Icon from '@components/ui/Icon.astro';
+import { difference } from '@data/home';
+---
+
+<section class="grain relative isolate section overflow-hidden">
+  <Image
+    src={difference.background}
+    alt=""
+    width={1920}
+    widths={[1024, 1600, 1920]}
+    quality={55}
+    sizes="100vw"
+    class="bg-drift absolute inset-0 -z-20 size-full object-cover [filter:grayscale(45%)]"
+    loading="eager"
+          decoding="async"
+    aria-hidden="true"
+  />
+  {/* Navy multiply over a part-desaturated photo = a branded duotone rather
+      than a generic black wash. The flat ink layer on top sets text contrast. */}
+  <div class="absolute inset-0 -z-10 bg-navy mix-blend-multiply" aria-hidden="true"></div>
+  <div class="absolute inset-0 -z-10 bg-ink/60" aria-hidden="true"></div>
+
+  <div class="container-tfm relative">
+    <div class="mx-auto max-w-3xl" data-reveal>
+      <SectionMark label={difference.eyebrow} onDark align="center" />
+      <Headline
+        html={difference.headlineHtml}
+        as="h2"
+        size="h2"
+        onDark
+        class="mt-5 text-center"
+      />
+    </div>
+
+    <ul class="mt-14 grid gap-6 md:grid-cols-3 lg:gap-8">
+      {
+        /* Each card is one whole link to the page that expands on its subject,
+           with the destination named at the bottom. `mt-auto` pins that row so
+           the three affordances align even when body lengths differ. */
+        difference.cards.map((card, index) => (
+          <li class="flex [perspective:900px]" data-reveal="zoom" style={`--reveal-delay:${index * 120}ms`}>
+            <a
+              href={card.href}
+              data-tilt
+              class="laminate-edge laminate-edge-on-dark group flex w-full flex-col overflow-hidden rounded-(--radius-card) bg-white
+                     transition-[transform,box-shadow] duration-200 ease-out will-change-transform
+                     hover:shadow-[0_28px_54px_-30px_rgba(0,0,0,0.7)]"
+            >
+              <div class="overflow-hidden">
+                <Image
+                  src={card.image}
+                  alt={card.imageAlt}
+                  width={800}
+                  widths={[400, 600, 800]}
+                  quality={74}
+                  sizes="(min-width: 768px) 33vw, 92vw"
+                  class="aspect-4/3 h-auto w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  loading="eager"
+          decoding="async"
+                />
+              </div>
+              <div class="flex flex-1 flex-col p-7">
+                <h3 class="font-display text-h3 font-bold text-ink transition-colors group-hover:text-brand">
+                  {card.title}
+                </h3>
+                <p class="mt-4">{card.body}</p>
+
+                <span
+                  class="mt-auto inline-flex items-center gap-2 pt-6 font-display text-[0.9375rem] font-semibold uppercase tracking-wide text-brand"
+                >
+                  {card.linkLabel}
+                  <Icon
+                    name="arrow-right"
+                    size={17}
+                    class="transition-transform duration-200 group-hover:translate-x-1"
+                  />
+                </span>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

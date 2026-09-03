@@ -1,0 +1,81 @@
+---
+import Icon from '@components/ui/Icon.astro';
+import { contact, socials } from '@data/site';
+
+/**
+ * The red contact strip above the header — the site's opening brand note.
+ *
+ * Deliberately spare: a 36px band can carry two items and one divider, nothing
+ * more. Earlier passes tried icon chips and a horizontal gradient; at this
+ * height the chips read as smudges and the gradient as banding. What sells it
+ * instead is the machined edge — a hairline highlight along the top and a
+ * shade along the bottom — the same rolled-edge depth the buttons have.
+ *
+ * Layout depends on whether there are social links to show: split when there
+ * are, centred when there aren't — a lone child under justify-between would
+ * strand against the left edge.
+ */
+const hasSocials = socials.length > 0;
+---
+
+<div
+  class="bg-brand text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.2)]"
+>
+  <div class="container-tfm">
+    <div
+      class:list={[
+        'flex flex-wrap items-center justify-center gap-y-1 py-2.5 text-center text-[0.8125rem]',
+        hasSocials && 'sm:justify-between sm:text-left',
+      ]}
+    >
+      <ul class="flex flex-wrap items-center justify-center gap-y-1">
+        <li>
+          <a
+            href={contact.phoneHref}
+            class="inline-flex items-center gap-2 font-medium tracking-[0.02em] transition-opacity hover:opacity-80"
+          >
+            <Icon name="phone" size={15} class="opacity-90" />
+            <span>{contact.phone}</span>
+          </a>
+        </li>
+
+        <li aria-hidden="true" class="mx-6 hidden h-3.5 w-px bg-white/30 sm:block"></li>
+
+        <li>
+          <a
+            href={contact.mapHref}
+            rel="noopener noreferrer"
+            target="_blank"
+            class="inline-flex items-center gap-2 font-medium tracking-[0.02em] transition-opacity hover:opacity-80"
+          >
+            <Icon name="pin" size={15} class="opacity-90" />
+            <span>{contact.address.full}</span>
+          </a>
+        </li>
+      </ul>
+
+      {
+        /* Renders only when real profile URLs exist in src/data/site.ts. The
+           live site ships four icons with empty href attributes — keyboard
+           traps that navigate nowhere. */
+        hasSocials && (
+          <ul class="flex items-center gap-1">
+            {socials.map((social) => (
+              <li>
+                <a
+                  href={social.href}
+                  class="inline-flex p-1.5 transition-opacity hover:opacity-75"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Icon name={social.icon} size={16} />
+                  <span class="sr-only">{social.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </div>
+</div>

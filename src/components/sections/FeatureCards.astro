@@ -1,0 +1,68 @@
+---
+import Headline from '@components/ui/Headline.astro';
+import SectionMark from '@components/ui/SectionMark.astro';
+import Icon from '@components/ui/Icon.astro';
+import FeatureIcon, { type FeatureIconName } from '@components/ui/FeatureIcon.astro';
+import { intro, features } from '@data/home';
+---
+
+<section class="section bg-white">
+  <div class="container-tfm">
+    {/* Left-anchored header. A split version put the supporting line alone in
+        the bottom-right corner, where a single orphaned sentence read as a
+        spacing mistake rather than a layout — it belongs under the headline. */}
+    <div class="max-w-3xl" data-reveal>
+      <SectionMark label={intro.eyebrow} class="mb-5" />
+      <p class="font-display text-h2 font-bold uppercase leading-tight text-navy">
+        {intro.lineOne}
+      </p>
+      <Headline html={intro.lineTwoHtml} as="h2" size="h2" class="mt-1" />
+      <p class="mt-5 text-lead leading-relaxed text-muted">
+        {intro.subhead}
+      </p>
+    </div>
+
+    <ul class="mt-12 grid gap-px overflow-hidden rounded-(--radius-card) border border-line bg-line md:grid-cols-3 lg:mt-14">
+      {
+        /* Each card is one whole link. On the live site these are wrapped in
+           anchors pointing at "#" — they look clickable and go nowhere. The
+           single-pixel grid gap over a line-coloured background draws the
+           dividers, so no rule doubles where two cards meet. */
+        features.map((feature, index) => (
+          <li class="flex [perspective:900px]" data-reveal style={`--reveal-delay:${index * 110}ms`}>
+            <a
+              href={feature.href}
+              data-tilt
+              class="laminate-edge group flex w-full flex-col items-start overflow-hidden bg-white px-8 pb-9 pt-11
+                     transition-[transform,box-shadow] duration-200 ease-out will-change-transform
+                     hover:z-10 hover:shadow-[0_22px_46px_-26px_rgba(30,34,38,0.5)]"
+            >
+              <FeatureIcon
+                name={feature.icon as FeatureIconName}
+                size={64}
+                class="transition-transform duration-300 ease-out group-hover:-translate-y-1"
+              />
+              <h3 class="mt-8 font-display text-h3 font-bold leading-tight text-ink transition-colors group-hover:text-brand">
+                {feature.title}
+              </h3>
+              <p class="mt-4">{feature.body}</p>
+
+              {/* The affordance: a card that navigates says so. `mt-auto` pins
+                  the three labels to a shared baseline across the row. */}
+              <span
+                class="mt-auto inline-flex items-center gap-2 pt-6 font-display text-[0.9375rem] font-semibold uppercase tracking-wide text-brand"
+              >
+                {feature.linkLabel}
+                <Icon
+                  name="arrow-right"
+                  size={17}
+                  class="transition-transform duration-200 group-hover:translate-x-1"
+                />
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

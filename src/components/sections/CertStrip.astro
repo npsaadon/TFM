@@ -1,0 +1,63 @@
+---
+import { Image } from 'astro:assets';
+import Headline from '@components/ui/Headline.astro';
+import SectionMark from '@components/ui/SectionMark.astro';
+import { certifications } from '@data/home';
+
+/**
+ * Accreditation badges.
+ *
+ * Two changes from the live site. It puts these in a rotating PowerPack
+ * carousel, so only some are visible at any moment and the rest are effectively
+ * hidden — these are trust signals for a buyer evaluating a contract
+ * manufacturer, and showing all six at once serves that better, with no
+ * JavaScript. And every badge there is labelled with its filename
+ * ("centi_PNG"), which tells a screen-reader user nothing; each is described
+ * properly in src/data/home.ts.
+ *
+ * The badges come from six different issuing bodies and share no visual
+ * language — blue circle, green circle, silver ribbon, yellow starburst. Rather
+ * than pretend otherwise, they sit in a bordered panel on a tinted band, which
+ * gives the mismatched set one containing shape.
+ */
+---
+
+<section class="section bg-surface">
+  <div class="container-tfm">
+    <div
+      class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:items-end lg:gap-12"
+      data-reveal
+    >
+      <div>
+        <SectionMark label={certifications.eyebrow} class="mb-5" />
+        <Headline html={certifications.headlineHtml} as="h2" size="h2" />
+      </div>
+      <p class="text-[0.9375rem] leading-relaxed lg:pb-1 lg:text-right">
+        {certifications.note}
+      </p>
+    </div>
+
+    <div class="mt-10 overflow-hidden rounded-(--radius-card) border border-line bg-white" data-reveal>
+      <ul
+        class="grid grid-cols-2 divide-x divide-y divide-line sm:grid-cols-3 lg:grid-cols-6 lg:divide-y-0"
+      >
+        {
+          certifications.badges.map((badge) => (
+            <li class="flex items-center justify-center p-7">
+              <Image
+                src={badge.src}
+                alt={badge.alt}
+                width={260}
+                widths={[130, 260]}
+                sizes="130px"
+                class="h-auto w-[6.5rem] object-contain"
+                loading="eager"
+          decoding="async"
+              />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

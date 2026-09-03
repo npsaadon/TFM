@@ -1,0 +1,198 @@
+---
+import Headline from '@components/ui/Headline.astro';
+import Button from '@components/ui/Button.astro';
+import { form, fields } from '@data/contact';
+
+const inputClass =
+  'w-full rounded-(--radius-control) border border-line bg-white px-4 py-3.5 text-ink placeholder:text-steel ' +
+  'transition-colors duration-150 outline-none ' +
+  'hover:border-steel focus:border-brand ' +
+  'aria-[invalid=true]:border-brand aria-[invalid=true]:bg-brand/[0.03]';
+---
+
+<div class="rounded-(--radius-card) bg-white p-7 shadow-[0_2px_28px_-18px_rgba(30,34,38,0.5)] sm:p-10">
+  <Headline html={form.headlineHtml} as="h2" size="h2" />
+  <p class="mt-5">{form.body}</p>
+
+  <form id="contact-form" class="mt-9" novalidate>
+    <!--
+      Honeypot. Hidden from sight and from assistive tech, and skipped in the
+      tab order, so no real person can reach it. Automated form-fillers fill
+      every input they find, which is exactly what gives them away.
+    -->
+    <div class="absolute h-px w-px overflow-hidden opacity-0" aria-hidden="true">
+      <label for="cf-company">Company (leave this blank)</label>
+      <input type="text" id="cf-company" name="company" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="grid gap-x-6 gap-y-5 sm:grid-cols-2">
+      {
+        fields.map((field) => (
+          <div class:list={[field.half ? 'sm:col-span-1' : 'sm:col-span-2']}>
+            <label
+              for={`cf-${field.name}`}
+              class="mb-2 block font-display text-[0.9375rem] font-medium text-ink"
+            >
+              {field.label}
+              {field.required ? (
+                <span class="text-brand" aria-hidden="true">
+                  {' '}
+                  *
+                </span>
+              ) : (
+                <span class="ml-1 font-sans text-sm font-normal text-muted">(optional)</span>
+              )}
+            </label>
+
+            {field.type === 'textarea' ? (
+              <textarea
+                id={`cf-${field.name}`}
+                name={field.name}
+                rows="6"
+                placeholder={field.placeholder}
+                required={field.required}
+                aria-describedby={`cf-${field.name}-error`}
+                class={`${inputClass} resize-y`}
+              />
+            ) : (
+              <input
+                type={field.type}
+                id={`cf-${field.name}`}
+                name={field.name}
+                placeholder={field.placeholder}
+                required={field.required}
+                autocomplete={field.autocomplete}
+                aria-describedby={`cf-${field.name}-error`}
+                class={inputClass}
+              />
+            )}
+
+            {/* Always in the DOM so aria-describedby never dangles. */}
+            <p
+              id={`cf-${field.name}-error`}
+              class="mt-1.5 hidden text-sm font-medium text-brand"
+              data-error-for={field.name}
+            />
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-8 flex flex-wrap items-center gap-5">
+      <Button type="submit" size="lg" id="cf-submit">{form.submitLabel}</Button>
+      <p class="text-sm text-muted">
+        <span class="text-brand" aria-hidden="true">*</span> Required
+      </p>
+    </div>
+
+    <!--
+      Status region. `role="status"` is announced politely, so a screen-reader
+      user hears the outcome without having the current sentence interrupted.
+    -->
+    <div
+      id="cf-status"
+      role="status"
+      aria-live="polite"
+      class="mt-6 hidden border-l-4 px-5 py-4 text-[0.9375rem]"
+    >
+    </div>
+  </form>
+</div>
+
+<script>
+  import { submitContactForm, validate, type ContactPayload, type FieldName } from '@/lib/contact';
+
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const status = document.getElementById('cf-status');
+  const submit = document.getElementById('cf-submit') as HTMLButtonElement | null;
+
+  if (form && status && submit) {
+    const loadedAt = performance.now();
+    const FIELDS: FieldName[] = ['name', 'email', 'subject', 'phone', 'message'];
+    const submitLabel = submit.textContent ?? 'Send';
+
+    const controlFor = (name: string) =>
+      form.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${name}"]`);
+    const errorFor = (name: string) =>
+      form.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
+
+    const readPayload = (): ContactPayload => ({
+      name: controlFor('name')?.value ?? '',
+      email: controlFor('email')?.value ?? '',
+      subject: controlFor('subject')?.value ?? '',
+      phone: controlFor('phone')?.value ?? '',
+      message: controlFor('message')?.value ?? '',
+      company: controlFor('company')?.value ?? '',
+      elapsedMs: performance.now() - loadedAt,
+    });
+
+    const showError = (name: FieldName, text: string | undefined) => {
+      const control = controlFor(name);
+      const error = errorFor(name);
+      if (!control || !error) return;
+
+      if (text) {
+        error.textContent = text;
+        error.classList.remove('hidden');
+        control.setAttribute('aria-invalid', 'true');
+      } else {
+        error.textContent = '';
+        error.classList.add('hidden');
+        control.removeAttribute('aria-invalid');
+      }
+    };
+
+    const setStatus = (text: string, ok: boolean) => {
+      status.textContent = text;
+      status.className = ok
+        ? 'mt-6 border-l-4 border-green-600 bg-green-50 px-5 py-4 text-[0.9375rem] text-green-900'
+        : 'mt-6 border-l-4 border-brand bg-brand/5 px-5 py-4 text-[0.9375rem] text-ink';
+    };
+
+    // Clear a field's error as soon as the visitor starts fixing it — leaving
+    // stale red text under a field they are actively correcting reads as broken.
+    for (const name of FIELDS) {
+      controlFor(name)?.addEventListener('input', () => {
+        if (controlFor(name)?.getAttribute('aria-invalid') === 'true') showError(name, undefined);
+      });
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const payload = readPayload();
+      const errors = validate(payload);
+
+      for (const name of FIELDS) showError(name, errors[name]);
+
+      if (Object.keys(errors).length > 0) {
+        setStatus('Please correct the highlighted fields and try again.', false);
+        status.classList.remove('hidden');
+        // Move focus to the first problem so keyboard and screen-reader users
+        // land on it directly instead of hunting for the red text.
+        const firstBad = FIELDS.find((name) => errors[name]);
+        if (firstBad) controlFor(firstBad)?.focus();
+        return;
+      }
+
+      submit.disabled = true;
+      submit.textContent = 'Sending…';
+
+      try {
+        const result = await submitContactForm(payload);
+        status.classList.remove('hidden');
+        setStatus(result.message, result.ok);
+        if (result.ok) form.reset();
+      } catch {
+        status.classList.remove('hidden');
+        setStatus(
+          'Something went wrong sending your message. Please call us at (800) 646-0112.',
+          false
+        );
+      } finally {
+        submit.disabled = false;
+        submit.textContent = submitLabel;
+      }
+    });
+  }
+</script>

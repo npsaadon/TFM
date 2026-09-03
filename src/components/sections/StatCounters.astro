@@ -1,0 +1,106 @@
+---
+import { stats } from '@data/home';
+
+/**
+ * The three headline figures.
+ *
+ * On the live site these are Elementor counter widgets whose script never runs,
+ * so all three permanently read "0" — the real values exist only in a
+ * `data-to-value` attribute. Here the number is rendered into the HTML up
+ * front, so it is right with JavaScript disabled, right for crawlers, and right
+ * for screen readers. The count-up is decoration layered on top.
+ *
+ * Visually this is a navy plinth sitting directly under the hero photograph:
+ * dark image, solid colour, then white. It gives the numbers somewhere to land
+ * instead of floating in the page's opening whitespace, and it is the one place
+ * the brand navy carries a whole band.
+ *
+ * The figures are white rather than brand red on purpose — red on this navy
+ * measures 2.1:1, well under any legibility floor. The red stays in the rule
+ * above each figure, where it is decoration and carries no meaning.
+ */
+---
+
+<section class="grain relative isolate overflow-hidden bg-navy" aria-label="TFM by the numbers">
+  {/* A faint diagonal wash keeps a large flat panel from reading as dead ink. */}
+  <div
+    class="absolute inset-0 -z-10 bg-linear-135 from-white/8 via-transparent to-black/25"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="container-tfm">
+    <dl class="grid divide-y divide-white/12 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+      {
+        stats.map((stat, index) => (
+          <div
+            class="px-6 py-11 text-center lg:py-14"
+            data-reveal
+            style={`--reveal-delay:${index * 90}ms`}
+          >
+            <span class="stat-tick mx-auto mb-6 block h-1 w-9 origin-center bg-brand" aria-hidden="true" />
+            <dd class="font-display text-stat font-bold leading-none tracking-tight text-white tabular-nums">
+              <span data-counter data-value={stat.value}>
+                <span data-counter-value>{stat.value}</span>
+              </span>
+              <span class="text-[0.55em] font-medium text-white/70">{stat.suffix}</span>
+            </dd>
+            <dt class="mx-auto mt-4 max-w-[16rem] text-[0.9375rem] leading-snug text-white/70">
+              {stat.label}
+            </dt>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<script>
+  /**
+   * Count up from zero once the row scrolls into view.
+   *
+   * The final value is already in the DOM, so this only animates toward text
+   * that is already correct — if anything here fails, the right number is still
+   * on screen. Decimals in the source value are preserved so 5.5 does not
+   * become 6.
+   */
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const counters = document.querySelectorAll<HTMLElement>('[data-counter]');
+
+  if (!reduced && 'IntersectionObserver' in window && counters.length) {
+    const animate = (el: HTMLElement) => {
+      const target = Number(el.dataset.value);
+      const output = el.querySelector<HTMLElement>('[data-counter-value]');
+      if (!output || !Number.isFinite(target)) return;
+
+      const decimals = (String(target).split('.')[1] ?? '').length;
+      const duration = 1600;
+      const start = performance.now();
+
+      const tick = (now: number) => {
+        const progress = Math.min((now - start) / duration, 1);
+        // easeOutCubic — quick off the mark, settling gently on the final value.
+        const eased = 1 - Math.pow(1 - progress, 3);
+        output.textContent = (target * eased).toFixed(decimals);
+        if (progress < 1) requestAnimationFrame(tick);
+        else output.textContent = target.toFixed(decimals);
+      };
+
+      output.textContent = (0).toFixed(decimals);
+      requestAnimationFrame(tick);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting && entry.boundingClientRect.bottom > 0) continue;
+          animate(entry.target as HTMLElement);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.4 }
+    );
+
+    counters.forEach((el) => observer.observe(el));
+  }
+</script>

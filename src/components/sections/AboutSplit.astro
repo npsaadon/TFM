@@ -1,0 +1,85 @@
+---
+import { Image } from 'astro:assets';
+import Headline from '@components/ui/Headline.astro';
+import SectionMark from '@components/ui/SectionMark.astro';
+import Button from '@components/ui/Button.astro';
+import Icon from '@components/ui/Icon.astro';
+import { contact } from '@data/site';
+import { about } from '@data/home';
+
+interface Props {
+  /** The About page repeats this block but without the "Read More" button. */
+  showCta?: boolean;
+}
+
+const { showCta = true } = Astro.props;
+---
+
+<section class="section bg-surface">
+  <div class="container-tfm">
+    <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      <div data-reveal="left">
+        <Image
+          src={about.image}
+          alt={about.imageAlt}
+          width={960}
+          widths={[480, 720, 960]}
+          quality={76}
+          sizes="(min-width: 1024px) 45vw, 92vw"
+          class="h-auto w-full rounded-(--radius-card) object-cover"
+          loading="eager"
+          decoding="async"
+        />
+      </div>
+
+      <div data-reveal="right" style="--reveal-delay:120ms">
+        <SectionMark label={about.eyebrow} />
+        <Headline
+          html={about.headlineHtml}
+          as="h2"
+          size="h2"
+          class="mt-5 [&>em]:text-navy"
+        />
+        <p class="mt-6">{about.body}</p>
+
+        <hr class="my-8 border-line" />
+
+        <ul class="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+          {
+            about.checklist.map((item) => (
+              <li class="flex items-start gap-3">
+                <span class="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-brand text-white">
+                  <Icon name="check" size={15} />
+                </span>
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="mt-9 flex flex-wrap items-center gap-x-8 gap-y-5">
+          <a
+            href={contact.phoneHref}
+            class="group flex items-center gap-4 transition-colors"
+          >
+            <span class="text-brand transition-transform duration-200 group-hover:scale-110">
+              <Icon name="phone" size={38} />
+            </span>
+            <span class="text-left">
+              <span
+                class="block font-display text-sm font-medium uppercase tracking-[0.14em] text-brand"
+              >
+                {about.callLabel}
+              </span>
+              <span class="block font-display text-lg font-bold text-ink group-hover:text-brand">
+                {contact.phone}
+              </span>
+            </span>
+          </a>
+
+          {showCta && <Button href={about.cta.href}>{about.cta.label}</Button>}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
