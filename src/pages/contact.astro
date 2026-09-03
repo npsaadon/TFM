@@ -1,0 +1,84 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHeader from '@components/sections/PageHeader.astro';
+import ContactForm from '@components/sections/ContactForm.astro';
+import Icon, { type IconName } from '@components/ui/Icon.astro';
+import { meta, pageHeader, cards } from '@data/contact';
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <PageHeader
+    title={pageHeader.title}
+    breadcrumb={pageHeader.breadcrumb}
+    image={pageHeader.image}
+    imagePosition={pageHeader.imagePosition}
+  />
+
+  <section class="section bg-surface">
+    <div class="container-tfm">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-12">
+        {/* `content-start` + `auto-rows-min` stop the cards stretching to match
+            the much taller form column beside them. */}
+        <ul class="grid auto-rows-min content-start gap-5 sm:grid-cols-2 lg:grid-cols-1">
+          {
+            cards.map((card, index) => (
+              <li data-reveal="left" style={`--reveal-delay:${index * 90}ms`}>
+                <a
+                  href={card.href}
+                  class="group flex items-center gap-5 rounded-(--radius-card) bg-white p-6 shadow-[0_6px_20px_-14px_rgba(30,34,38,0.35)]
+                         transition-all duration-300
+                         hover:-translate-y-0.5 hover:shadow-[0_16px_38px_-20px_rgba(30,34,38,0.5)]"
+                  {...(card.href.startsWith('http')
+                    ? { rel: 'noopener noreferrer', target: '_blank' }
+                    : {})}
+                >
+                  <span
+                    class="inline-flex size-14 shrink-0 items-center justify-center rounded-full
+                           bg-brand text-white transition-transform duration-300 group-hover:scale-110"
+                  >
+                    <Icon name={card.icon as IconName} size={24} />
+                  </span>
+                  <span class="min-w-0">
+                    <span class="block font-display text-lg font-bold text-ink">
+                      {card.title}
+                    </span>
+                    <span class="block break-words text-muted group-hover:text-brand">
+                      {card.value}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div data-reveal="right" style="--reveal-delay:140ms">
+          <ContactForm />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/*
+    Directions map, full-bleed like the live site's.
+
+    This is the site's ONE third-party embed. The Content-Security-Policy in
+    public/_headers carves out `frame-src` for google.com specifically so it
+    can load — any other iframe origin stays blocked. Keyless `output=embed`
+    endpoint, lazy-loaded so it costs nothing until scrolled to, and
+    `referrerpolicy` keeps the visitor's URL out of the request.
+  */}
+  <section aria-label="Map and directions to TFM" class="border-t border-line">
+    <iframe
+      src="https://www.google.com/maps?q=1180+Church+Rd,+Lansdale,+PA+19446&z=11&output=embed"
+      title="Map showing the TFM facility at 1180 Church Rd, Lansdale, PA"
+      class="block h-[24rem] w-full border-0 lg:h-[28rem]"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      allowfullscreen
+    ></iframe>
+  </section>
+
+  {/* No consultation banner here: its button links to the contact page — a
+      self-link on the very page it points at. */}
+</BaseLayout>

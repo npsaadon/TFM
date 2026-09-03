@@ -1,0 +1,29 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Hero from '@components/sections/Hero.astro';
+import StatCounters from '@components/sections/StatCounters.astro';
+import FeatureCards from '@components/sections/FeatureCards.astro';
+import AboutSplit from '@components/sections/AboutSplit.astro';
+import PrivateLabelBanner from '@components/sections/PrivateLabelBanner.astro';
+import DifferenceCards from '@components/sections/DifferenceCards.astro';
+import CertStrip from '@components/sections/CertStrip.astro';
+import FinalCta from '@components/sections/FinalCta.astro';
+import { site } from '@data/site';
+---
+
+<BaseLayout
+  title={`${site.name} — ${site.tagline}`}
+  description="TFM is a 100% U.S.-based foam and mattress manufacturer offering private label solutions, warehousing, and drop shipping for the world's leading mattress brands."
+  bareTitle
+>
+  <Hero />
+  <StatCounters />
+  <FeatureCards />
+  <AboutSplit />
+  <PrivateLabelBanner />
+  <DifferenceCards />
+  <CertStrip />
+  {/* The live site stacks a second dark consultation band directly under this
+      one — two adjacent CTAs asking for the same action. One ask, made well. */}
+  <FinalCta />
+</BaseLayout>

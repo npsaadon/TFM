@@ -1,0 +1,51 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Button from '@components/ui/Button.astro';
+import Icon from '@components/ui/Icon.astro';
+import { nav } from '@data/site';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="That page could not be found. Browse TFM's foam and private label mattress manufacturing services, or get in touch."
+>
+  <section class="section bg-white">
+    <div class="container-tfm">
+      <div class="mx-auto max-w-2xl py-10 text-center">
+        <p class="font-display text-display font-bold leading-none text-brand">404</p>
+        <h1 class="headline mt-4 text-h2">This page doesn't exist</h1>
+        <p class="mt-5">
+          The page you're looking for may have moved or never existed. Here's where you
+          can go instead:
+        </p>
+
+        <ul class="mt-8 flex flex-wrap justify-center gap-3">
+          {
+            nav.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="inline-block border border-line px-5 py-2.5 font-display text-[0.9375rem]
+                         uppercase tracking-wide text-ink transition-colors hover:border-brand hover:text-brand"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <div class="mt-10">
+          <Button href="/" size="lg">
+            Back to home
+            <Icon
+              name="arrow-right"
+              size={18}
+              class="transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

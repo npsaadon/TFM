@@ -1,0 +1,134 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHeader from '@components/sections/PageHeader.astro';
+import AboutSplit from '@components/sections/AboutSplit.astro';
+import Headline from '@components/ui/Headline.astro';
+import Button from '@components/ui/Button.astro';
+import Icon from '@components/ui/Icon.astro';
+import { meta, pageHeader, statements, madeInUsa, customization, trustBanner } from '@data/about';
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} image={pageHeader.image} />
+
+  <AboutSplit showCta={false} />
+
+  {/*
+    "Proudly Made in the USA" — the flag-painted loading dock doors from the
+    live site. There the copy floated straight over the stripes and fought them
+    for legibility; here the photograph stays full colour (this is the one dark
+    band that is deliberately NOT navy-duotoned — the flag IS the point) and
+    the copy sits on solid cards, so the image and the words each get to win.
+
+    `made-in-usa` and `capabilities` are link targets from the homepage feature
+    cards — renaming either breaks those links, and the link audit test fails
+    the build if that happens.
+  */}
+  <section id="made-in-usa" class="relative isolate section overflow-hidden">
+    <Image
+      src={madeInUsa.background}
+      alt=""
+      width={1920}
+      widths={[1024, 1600, 1920]}
+      quality={62}
+      sizes="100vw"
+      class="bg-drift absolute inset-0 -z-20 size-full object-cover"
+      loading="eager"
+          decoding="async"
+      aria-hidden="true"
+    />
+    <div class="absolute inset-0 -z-10 bg-ink/35" aria-hidden="true"></div>
+
+    <div class="container-tfm">
+      <div class="grid items-stretch gap-8 lg:grid-cols-2 lg:gap-12">
+        <div
+          id="capabilities"
+          class="rounded-(--radius-card) bg-white/97 p-8 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.55)] backdrop-blur-sm lg:p-10"
+          data-reveal="left"
+        >
+          <p class="font-display text-h3 font-bold leading-snug text-ink">
+            {statements[0]}
+          </p>
+          <hr class="my-6 border-t-2 border-brand" />
+          <p>{statements[1]}</p>
+        </div>
+
+        <div
+          class="rounded-(--radius-card) bg-ink/90 p-8 text-white/85 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.55)] backdrop-blur-sm lg:p-10"
+          data-reveal="right"
+          style="--reveal-delay:120ms"
+        >
+          <p class="font-display text-sm font-semibold uppercase tracking-[0.16em] text-brand">
+            {madeInUsa.kicker}
+          </p>
+          <Headline html={madeInUsa.headlineHtml} as="h2" size="h2" onDark class="mt-3" />
+          <div class="prose-tfm mt-6">
+            {madeInUsa.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-white">
+    <div class="container-tfm">
+      <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+        <div data-reveal="left">
+          <h2 class="headline text-h2">{customization.headline}</h2>
+          <p class="mt-7">{customization.body}</p>
+        </div>
+        <div data-reveal="right" style="--reveal-delay:120ms">
+          <Image
+            src={customization.image}
+            alt={customization.imageAlt}
+            width={960}
+            widths={[480, 720, 960]}
+            quality={74}
+            sizes="(min-width: 1024px) 45vw, 92vw"
+            class="aspect-4/3 h-auto w-full rounded-(--radius-card) object-cover"
+            loading="eager"
+          decoding="async"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grain relative isolate section overflow-hidden">
+    <Image
+      src={trustBanner.background}
+      alt=""
+      width={1920}
+      widths={[1024, 1600, 1920]}
+      quality={55}
+      sizes="100vw"
+      class="bg-drift absolute inset-0 -z-20 size-full object-cover [filter:grayscale(45%)]"
+      loading="eager"
+          decoding="async"
+      aria-hidden="true"
+    />
+    {/* Same navy-duotone recipe as the homepage's dark bands. */}
+    <div class="absolute inset-0 -z-10 bg-navy mix-blend-multiply" aria-hidden="true"></div>
+    <div class="absolute inset-0 -z-10 bg-ink/55" aria-hidden="true"></div>
+
+    <div class="container-tfm relative">
+      <div class="mx-auto max-w-3xl text-center" data-reveal>
+        <p class="eyebrow eyebrow-on-dark">
+          {trustBanner.eyebrow}
+        </p>
+        <Headline html={trustBanner.headline} as="h2" size="h2" onDark class="mt-2" />
+        <div class="mt-10">
+          <Button href={trustBanner.cta.href} size="lg">
+            {trustBanner.cta.label}
+            <Icon
+              name="arrow-right"
+              size={18}
+              class="transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

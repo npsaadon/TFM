@@ -1,0 +1,129 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageHeader from '@components/sections/PageHeader.astro';
+import Headline from '@components/ui/Headline.astro';
+import SectionMark from '@components/ui/SectionMark.astro';
+import Button from '@components/ui/Button.astro';
+import Icon from '@components/ui/Icon.astro';
+import { meta, pageHeader, blocks, why, closing } from '@data/privateLabel';
+---
+
+<BaseLayout title={meta.title} description={meta.description}>
+  <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} image={pageHeader.image} />
+
+  {/* The live site opens this page with a standalone "Everything you need to
+      succeed" band before any content — removed at the owner's request; the
+      alternating blocks below open the page directly. */}
+  {
+    blocks.map((block, index) => (
+      <section
+        id={block.id}
+        class:list={['section', index % 2 === 0 ? 'bg-surface' : 'bg-white']}
+      >
+        <div class="container-tfm">
+          <div class="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div
+              class:list={['order-1', block.flip ? 'lg:order-2' : 'lg:order-1']}
+              data-reveal={block.flip ? 'right' : 'left'}
+            >
+              <Image
+                src={block.image}
+                alt={block.imageAlt}
+                width={960}
+                widths={[480, 720, 960]}
+                quality={76}
+                sizes="(min-width: 1024px) 45vw, 92vw"
+                class="aspect-4/3 h-auto w-full rounded-(--radius-card) object-cover"
+                loading="eager"
+          decoding="async"
+              />
+            </div>
+
+            <div
+              class:list={['order-2', block.flip ? 'lg:order-1' : 'lg:order-2']}
+              data-reveal={block.flip ? 'left' : 'right'}
+              style="--reveal-delay:120ms"
+            >
+              <h2 class="headline text-h2">{block.title}</h2>
+              <p class="mt-6">{block.body}</p>
+              <div class="mt-8">
+                <Button href={block.cta.href}>
+                  {block.cta.label}
+                  <Icon
+                    name="arrow-right"
+                    size={18}
+                    class="transition-transform duration-200 group-hover:translate-x-1"
+                  />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section bg-ink">
+    <div class="container-tfm">
+      <div class="mx-auto max-w-3xl" data-reveal>
+        {/* A giant brand-red 'TFM' sat here — red on ink measures 2.5:1 and
+            fails the 3:1 large-text floor. The standard section mark does the
+            same job legibly. */}
+        <SectionMark label={why.kicker} onDark align="center" />
+        <Headline html={why.headline} as="h2" size="h2" onDark class="mt-5 text-center" />
+      </div>
+
+      {/* Informational cards, not links — so no hover-lift: motion that mimics
+          a navigating card promises a click that does nothing. */}
+      <ul class="mt-14 grid gap-6 md:grid-cols-3 lg:gap-8">
+        {
+          why.cards.map((card, index) => (
+            <li
+              class="flex flex-col overflow-hidden rounded-(--radius-card) border-t-4 border-brand bg-white"
+              data-reveal
+              style={`--reveal-delay:${index * 120}ms`}
+            >
+              <Image
+                src={card.image}
+                alt={card.imageAlt}
+                width={800}
+                widths={[400, 600, 800]}
+                quality={72}
+                sizes="(min-width: 768px) 33vw, 92vw"
+                class="aspect-video h-auto w-full object-cover"
+                loading="eager"
+          decoding="async"
+              />
+              <div class="p-8">
+                <h3 class="font-display text-h3 font-bold text-ink">{card.title}</h3>
+                <p class="mt-4">{card.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section bg-white">
+    <div class="container-tfm">
+      <div class="mx-auto max-w-3xl text-center" data-reveal>
+        <p class="eyebrow">
+          {closing.eyebrow}
+        </p>
+        <h2 class="headline mt-2 text-h2">{closing.headline}</h2>
+        <div class="mt-9">
+          <Button href={closing.cta.href} size="lg">
+            {closing.cta.label}
+            <Icon
+              name="arrow-right"
+              size={18}
+              class="transition-transform duration-200 group-hover:translate-x-1"
+            />
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
