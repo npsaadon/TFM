@@ -77,6 +77,21 @@ function loadGlobalHeaders() {
 
 const globalHeaders = loadGlobalHeaders();
 
+// This server speaks plain HTTP (localhost and LAN previews). Two production
+// directives are actively harmful here: 'upgrade-insecure-requests' makes
+// browsers rewrite every asset request to https://<lan-ip>, where nothing
+// listens — the page loads and all of its CSS, images, and fonts silently
+// fail — and HSTS is meaningless without TLS. Real hosts serve HTTPS and get
+// the full policy from public/_headers untouched.
+if (globalHeaders['Content-Security-Policy']) {
+  globalHeaders['Content-Security-Policy'] = globalHeaders['Content-Security-Policy']
+    .split(';')
+    .map((d) => d.trim())
+    .filter((d) => d && d !== 'upgrade-insecure-requests')
+    .join('; ');
+}
+delete globalHeaders['Strict-Transport-Security'];
+
 const send = (res, status, body, headers = {}) => {
   res.writeHead(status, { ...globalHeaders, ...headers });
   res.end(body);
