@@ -1,0 +1,8 @@
+# The live WordPress robots.txt contains only a Crawl-Delay of 20, which slows
+# legitimate crawlers to a page every 20 seconds and points them at no sitemap.
+# A static site has no reason to throttle anyone.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://tfm-us.com/sitemap-index.xml

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TFM">
+  <!--
+    Simplified favicon mark.
+
+    The supplied favicon was the full logo — wordmark, star bar and "MADE IN
+    USA" rule — squeezed into a square, which turns to mush below about 64px.
+    A favicon is read at 16px, so this keeps only the part that identifies the
+    brand: the TFM monogram in brand navy, over the red rule. Letterforms are
+    drawn as plain geometry so the mark never depends on a font being present.
+  -->
+  <rect width="64" height="64" rx="8" fill="#323659"/>
+
+  <!-- T -->
+  <path fill="#ffffff" d="M8 17h14v4.6h-4.9V39h-4.2V21.6H8z"/>
+  <!-- F -->
+  <path fill="#ffffff" d="M25 17h11v4.6h-6.8v3.6h6V29h-6v10h-4.2z"/>
+  <!-- M -->
+  <path fill="#ffffff" d="M38.6 17h4.1l4.4 10.6L51.5 17h4.1v22h-4.1V27.7l-3.2 7.6h-1.4l-3.2-7.6V39h-4.1z"/>
+
+  <!-- brand rule -->
+  <rect x="8" y="44.5" width="48" height="5" fill="#be2a2b"/>
+</svg>
