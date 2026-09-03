@@ -1,0 +1,29 @@
+---
+/**
+ * A section's opening mark: the laminate rule above a small label.
+ *
+ * Pairing the two in one component is what keeps the motif disciplined — the
+ * rule never appears on its own as decoration, and a label never appears
+ * without it. See `.laminate` in global.css for why the stack is the mark.
+ */
+
+interface Props {
+  label: string;
+  onDark?: boolean;
+  align?: 'start' | 'center';
+  class?: string;
+}
+
+const { label, onDark = false, align = 'start', class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={[
+    'flex flex-col gap-3',
+    align === 'center' ? 'items-center text-center' : 'items-start',
+    className,
+  ]}
+>
+  <span class:list={['laminate', onDark && 'laminate-on-dark']} aria-hidden="true"></span>
+  <p class:list={['eyebrow', onDark && 'eyebrow-on-dark']}>{label}</p>
+</div>

@@ -1,0 +1,76 @@
+---
+/**
+ * The site's one button. Renders an <a> when given `href`, otherwise a
+ * <button>, so a link never masquerades as a control or vice versa.
+ *
+ * The original design's buttons are hard-edged red rectangles. That shape is
+ * kept; what is added is a real hover state, a pressed state, and a focus ring
+ * — none of which the live site has.
+ */
+
+interface Props {
+  href?: string;
+  type?: 'button' | 'submit';
+  variant?: 'primary' | 'outline' | 'ghost';
+  size?: 'md' | 'lg';
+  class?: string;
+  id?: string;
+}
+
+const {
+  href,
+  type = 'button',
+  variant = 'primary',
+  size = 'md',
+  class: className = '',
+  id,
+} = Astro.props;
+
+const base =
+  'group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-(--radius-control) ' +
+  'font-display font-medium tracking-wide uppercase transition-all duration-200 ease-out ' +
+  'active:translate-y-px disabled:pointer-events-none disabled:opacity-60';
+
+const sizes = {
+  md: 'px-7 py-3.5 text-[0.9375rem]',
+  lg: 'px-9 py-4 text-base',
+} as const;
+
+const variants = {
+  primary:
+    'bg-brand text-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] ' +
+    'hover:bg-brand-dark hover:shadow-[0_10px_26px_-10px_rgba(190,42,43,0.75)] ' +
+    'active:bg-brand-darker ' +
+    // Shine sweep: a soft white band crosses the button once per hover.
+    'before:absolute before:inset-y-0 before:-left-full before:w-full ' +
+    'before:bg-linear-to-r before:from-transparent before:via-white/25 before:to-transparent ' +
+    'before:transition-transform before:duration-500 before:ease-out ' +
+    'hover:before:translate-x-[200%] motion-reduce:before:hidden',
+  outline:
+    'border-2 border-white/80 text-white hover:bg-white hover:text-ink hover:border-white',
+  ghost:
+    'border-2 border-brand text-brand hover:bg-brand hover:text-white',
+} as const;
+
+const cls = [base, sizes[size], variants[variant], className].filter(Boolean).join(' ');
+
+/** Treat anything not starting with "/" or "#" as leaving the site. */
+const isExternal = Boolean(href && !/^[/#]/.test(href));
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      id={id}
+      class={cls}
+      {...(isExternal ? { rel: 'noopener noreferrer', target: '_blank' } : {})}
+    >
+      <slot />
+    </a>
+  ) : (
+    <button type={type} id={id} class={cls}>
+      <slot />
+    </button>
+  )
+}

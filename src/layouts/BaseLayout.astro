@@ -1,0 +1,224 @@
+---
+import Header from '@components/layout/Header.astro';
+import Footer from '@components/layout/Footer.astro';
+import { site, contact } from '@data/site';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Omit the "| TFM US" suffix — used by the homepage, which sets its own. */
+  bareTitle?: boolean;
+}
+
+const { title, description, bareTitle = false } = Astro.props;
+
+const pageTitle = bareTitle ? title : `${title} | ${site.name}`;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+
+/**
+ * Structured data. Describes the company once, in the format search engines
+ * and AI crawlers actually read, so the phone number, address and identity are
+ * machine-readable rather than only visible in the footer.
+ */
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${site.url}/#organization`,
+  name: site.legalName,
+  url: site.url,
+  telephone: contact.phone,
+  email: contact.email,
+  description: 'U.S.-based foam and mattress manufacturer offering private label solutions, warehousing, and drop shipping.',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: contact.address.street,
+    addressLocality: contact.address.city,
+    addressRegion: contact.address.region,
+    postalCode: contact.address.postalCode,
+    addressCountry: 'US',
+  },
+  areaServed: 'Worldwide',
+};
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${site.url}/#website`,
+  url: site.url,
+  name: site.name,
+  publisher: { '@id': `${site.url}/#organization` },
+};
+---
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <meta name="theme-color" content="#be2a2b" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    {/* Both faces are needed above the fold, so fetch them in parallel with the CSS. */}
+    <link rel="preload" href="/fonts/oswald-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/roboto-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+
+    {/* Swap `no-js` for `js` before first paint so CSS can branch without a flash. */}
+    <script is:inline>
+      document.documentElement.classList.replace('no-js', 'js');
+    </script>
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationSchema)}
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+  </head>
+
+  <body class="antialiased">
+    {/* Reading progress: a thin brand rule along the top of the viewport that
+        fills as the page is scrolled. State, not decoration — it stays under
+        prefers-reduced-motion (only its easing is affected, not its meaning). */}
+    <div
+      id="scroll-progress"
+      class="fixed inset-x-0 top-0 z-[60] h-[3px] origin-left scale-x-0 bg-linear-to-r from-brand to-brand-dark"
+      aria-hidden="true"
+    >
+    </div>
+
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100]
+             focus:bg-brand focus:px-5 focus:py-3 focus:font-display focus:text-white focus:uppercase"
+    >
+      Skip to content
+    </a>
+
+    <Header />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <script>
+      /**
+       * Scroll reveal.
+       *
+       * Elements marked `data-reveal` fade up once as they enter the viewport,
+       * then stop being observed. Bails out entirely when the visitor prefers
+       * reduced motion, and if IntersectionObserver is missing everything is
+       * simply shown.
+       */
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');
+
+      if (reduced || !('IntersectionObserver' in window)) {
+        targets.forEach((el) => el.classList.add('is-visible'));
+      } else {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              // Reveal when the element enters the viewport, and also when it
+              // is already above it. Without the second case, anything scrolled
+              // straight past — a deep link, a refresh partway down the page,
+              // a "skip to content" jump — would stay permanently invisible,
+              // because IntersectionObserver only reports the state it finds.
+              const scrolledPast = entry.boundingClientRect.bottom < 0;
+              if (!entry.isIntersecting && !scrolledPast) continue;
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          },
+          { rootMargin: '0px 0px -10% 0px', threshold: 0.08 }
+        );
+        const onLoadNow: HTMLElement[] = [];
+        targets.forEach((el) => {
+          // Content already on screen at load animates in immediately, all
+          // together — one entrance, no per-card stagger. Content below the
+          // fold keeps the staggered scroll reveal.
+          const rect = el.getBoundingClientRect();
+          if (rect.top < window.innerHeight && rect.bottom > 0) {
+            el.classList.add('reveal-load');
+            onLoadNow.push(el);
+          } else {
+            observer.observe(el);
+          }
+        });
+        // Next frame, so the transition animates from the hidden state instead
+        // of the class landing before first paint.
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => onLoadNow.forEach((el) => el.classList.add('is-visible')))
+        );
+      }
+    </script>
+
+    <script>
+      /** Reading progress bar — transform-only, so it never causes layout. */
+      const bar = document.getElementById('scroll-progress');
+      if (bar) {
+        let queued = false;
+        const paint = () => {
+          const max = document.documentElement.scrollHeight - window.innerHeight;
+          bar.style.transform = `scaleX(${max > 0 ? Math.min(window.scrollY / max, 1) : 0})`;
+          queued = false;
+        };
+        window.addEventListener(
+          'scroll',
+          () => {
+            if (!queued) {
+              queued = true;
+              requestAnimationFrame(paint);
+            }
+          },
+          { passive: true }
+        );
+        paint();
+      }
+    </script>
+
+    <script>
+      /**
+       * Card tilt: elements marked `data-tilt` lean toward the cursor — at most
+       * ~3.5deg, plus a slight lift — and spring back on leave. Pointer-fine
+       * devices only (a thumb has no hover), and never under reduced motion.
+       */
+      const fine = window.matchMedia('(pointer: fine)').matches;
+      const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (fine && !noMotion) {
+        for (const card of document.querySelectorAll<HTMLElement>('[data-tilt]')) {
+          card.addEventListener('pointermove', (event) => {
+            const rect = card.getBoundingClientRect();
+            const x = (event.clientX - rect.left) / rect.width - 0.5;
+            const y = (event.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform =
+              `translateY(-6px) rotateX(${(-y * 3.5).toFixed(2)}deg) rotateY(${(x * 3.5).toFixed(2)}deg)`;
+          });
+          card.addEventListener('pointerleave', () => {
+            card.style.transform = '';
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

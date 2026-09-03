@@ -1,0 +1,75 @@
+---
+/**
+ * Icons for the three service cards.
+ *
+ * Drawn as a set: navy structure, red working inside each drawing (stripes,
+ * door, chassis band), and the shared red base bar — the rule from beneath the
+ * TFM wordmark — grounding all three. Solid geometry, no strokes, so they stay
+ * crisp at any size.
+ */
+
+export type FeatureIconName = 'usa' | 'warehouse' | 'shipping';
+
+interface Props {
+  name: FeatureIconName;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 56, class: className = '' } = Astro.props;
+
+const forms: Record<FeatureIconName, string> = {
+  // The flag, as requested: pole, finial, navy canton with a star, red
+  // stripes. White stripes are gaps, so a hairline navy frame keeps the
+  // flag's edge crisp on a white card.
+  usa: `
+    <rect x="7" y="6" width="2.6" height="36" rx="1.3" fill="var(--color-navy)"/>
+    <circle cx="8.3" cy="4.6" r="2.1" fill="var(--color-brand)"/>
+    <rect x="11.5" y="8" width="30.5" height="21" fill="none" stroke="var(--color-navy)" stroke-width="1.6"/>
+    <rect x="11.5" y="8" width="13" height="9.5" fill="var(--color-navy)"/>
+    <path d="m18 10 .95 1.93 2.13.31-1.54 1.5.36 2.12L18 14.86l-1.9 1  .36-2.12-1.54-1.5 2.13-.31Z" fill="#fff"/>
+    <rect x="24.5" y="9.6" width="17.5" height="2.6" fill="var(--color-brand)"/>
+    <rect x="24.5" y="14.9" width="17.5" height="2.6" fill="var(--color-brand)"/>
+    <rect x="11.5" y="20.2" width="30.5" height="2.6" fill="var(--color-brand)"/>
+    <rect x="11.5" y="25.4" width="30.5" height="2.6" fill="var(--color-brand)"/>
+  `,
+  // A gabled warehouse: navy shell, red roller door, windows either side.
+  warehouse: `
+    <path d="M5.5 40V19.5L24 7l18.5 12.5V40h-4.6V21.9L24 12.5 10.1 21.9V40Z" fill="var(--color-navy)"/>
+    <rect x="18.6" y="25" width="10.8" height="15" rx="1" fill="var(--color-brand)"/>
+    <rect x="20.6" y="28" width="6.8" height="1.8" fill="#fff" opacity="0.85"/>
+    <rect x="20.6" y="31.6" width="6.8" height="1.8" fill="#fff" opacity="0.85"/>
+    <rect x="11.6" y="26" width="4.6" height="4.6" rx="0.8" fill="var(--color-navy)"/>
+    <rect x="31.8" y="26" width="4.6" height="4.6" rx="0.8" fill="var(--color-navy)"/>
+  `,
+  // A box truck at speed: navy body and cab, red chassis band, motion lines.
+  shipping: `
+    <rect x="1" y="17" width="4" height="2.2" rx="1.1" fill="var(--color-brand)"/>
+    <rect x="1" y="22.5" width="6.5" height="2.2" rx="1.1" fill="var(--color-brand)"/>
+    <rect x="9" y="12.5" width="22.5" height="17" rx="1.6" fill="var(--color-navy)"/>
+    <path d="M31.5 17.5h6.6a2 2 0 0 1 1.62.84l3.4 4.75c.25.34.38.75.38 1.17v4.24a1 1 0 0 1-1 1h-11Z" fill="var(--color-navy)"/>
+    <rect x="33.8" y="19.8" width="4.6" height="4" rx="0.8" fill="#fff" opacity="0.85"/>
+    <rect x="9" y="27" width="34.3" height="2.5" fill="var(--color-brand)"/>
+    <circle cx="16" cy="34" r="4.1" fill="var(--color-navy)"/>
+    <circle cx="16" cy="34" r="1.7" fill="#fff"/>
+    <circle cx="35.5" cy="34" r="4.1" fill="var(--color-navy)"/>
+    <circle cx="35.5" cy="34" r="1.7" fill="#fff"/>
+  `,
+};
+
+const body = forms[name];
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 48 48"
+  width={size}
+  height={size}
+  class={className}
+  aria-hidden="true"
+  focusable="false"
+>
+  <g set:html={body} />
+  {/* The red rule from beneath the wordmark, carried into every icon. */}
+  <rect x="2" y="44" width="44" height="3.2" rx="1.6" fill="var(--color-brand)" />
+</svg>

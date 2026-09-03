@@ -1,0 +1,62 @@
+---
+/**
+ * The brand's signature headline: uppercase Oswald with exactly one word in
+ * red. Content arrives as a small HTML string where `<em>` marks the accent
+ * word — see any `headlineHtml` field in src/data.
+ *
+ * Only `<em>` and `<br>` are permitted. The string is sanitised below rather
+ * than trusted, so even though every value is authored by us today, a future
+ * CMS or import path cannot turn a content field into an HTML injection.
+ */
+
+interface Props {
+  html: string;
+  as?: 'h1' | 'h2' | 'h3' | 'p' | 'span';
+  size?: 'display' | 'h1' | 'h2' | 'h3';
+  onDark?: boolean;
+  class?: string;
+  id?: string;
+}
+
+const {
+  html,
+  as: Tag = 'h2',
+  size = 'h2',
+  onDark = false,
+  class: className = '',
+  id,
+} = Astro.props;
+
+/**
+ * Escape everything, then re-permit exactly `<em>`, `</em>` and `<br>`.
+ * Anything else — attributes, other tags, stray angle brackets — stays inert
+ * text. This is an allowlist, so it cannot be widened by accident.
+ */
+function sanitize(input: string): string {
+  return input
+    .replace(/&(?!(?:amp|lt|gt|quot|#\d+|#x[0-9a-fA-F]+|rsquo|nbsp);)/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/&lt;em&gt;/g, '<em>')
+    .replace(/&lt;\/em&gt;/g, '</em>')
+    .replace(/&lt;br\s*\/?&gt;/g, '<br />');
+}
+
+const sizeClass = {
+  display: 'text-display leading-[1.05]',
+  h1: 'text-h1',
+  h2: 'text-h2',
+  h3: 'text-h3',
+}[size];
+
+const cls = [
+  'headline',
+  sizeClass,
+  onDark ? 'headline-on-dark' : '',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<Tag id={id} class={cls} set:html={sanitize(html)} />

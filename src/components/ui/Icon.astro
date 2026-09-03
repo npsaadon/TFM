@@ -1,0 +1,86 @@
+---
+/**
+ * Inline UI icons.
+ *
+ * Rendered inline rather than fetched so they cost no extra request, inherit
+ * `currentColor`, and never flash unstyled. All are drawn on a 24x24 grid with
+ * a 1.75 stroke so they sit consistently next to Roboto text.
+ *
+ * The three illustrative feature icons (US flag, warehouse, shipping box) are
+ * multi-colour artwork from the media library and live in FeatureIcon.astro
+ * instead — they are pictures, not glyphs.
+ */
+
+export type IconName =
+  | 'phone'
+  | 'mail'
+  | 'globe'
+  | 'pin'
+  | 'check'
+  | 'arrow-right'
+  | 'menu'
+  | 'close'
+  | 'facebook'
+  | 'instagram'
+  | 'twitter'
+  | 'youtube'
+  | 'linkedin';
+
+interface Props {
+  name: IconName;
+  size?: number;
+  class?: string;
+  /** Needed so scripts can target a specific icon (e.g. the menu open/close pair). */
+  id?: string;
+}
+
+const { name, size = 24, class: className = '', id } = Astro.props;
+
+/** Stroked glyphs — inherit colour, scale cleanly, stay legible when small. */
+const stroked: Partial<Record<IconName, string>> = {
+  phone:
+    '<path d="M6.6 3.5 9 3.9l1.1 3.4-1.9 1.4a12.4 12.4 0 0 0 5.1 5.1l1.4-1.9 3.4 1.1.4 2.4a2 2 0 0 1-2 2.3A15.4 15.4 0 0 1 4.3 5.5a2 2 0 0 1 2.3-2Z"/>',
+  mail: '<path d="M3 6.5h18v11H3z"/><path d="m3.4 7 8.6 6 8.6-6"/>',
+  globe:
+    '<circle cx="12" cy="12" r="9"/><path d="M3.2 9.5h17.6M3.2 14.5h17.6"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18Z"/>',
+  pin: '<path d="M12 21c4-4.6 6-8 6-10.8A6 6 0 0 0 6 10.2C6 13 8 16.4 12 21Z"/><circle cx="12" cy="10.2" r="2.3"/>',
+  check: '<path d="m5 12.5 4.2 4.2L19 7"/>',
+  'arrow-right': '<path d="M4 12h15"/><path d="m13 6 6 6-6 6"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  close: '<path d="m6 6 12 12M18 6 6 18"/>',
+};
+
+/** Brand marks — solid shapes, so they are filled rather than stroked. */
+const filled: Partial<Record<IconName, string>> = {
+  facebook:
+    '<path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6A22 22 0 0 0 14.3 3.5c-2.4 0-4 1.45-4 4.1v2.3H7.6V13h2.7v8Z"/>',
+  instagram:
+    '<path d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.8.25 2.23.42.56.21.96.47 1.38.89.42.42.68.82.89 1.38.17.42.37 1.06.42 2.23.06 1.25.07 1.62.07 4.81s0 3.56-.07 4.81c-.05 1.17-.25 1.8-.42 2.23a3.7 3.7 0 0 1-.89 1.38c-.42.42-.82.68-1.38.89-.42.17-1.06.37-2.23.42-1.25.06-1.62.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.8-.25-2.23-.42a3.7 3.7 0 0 1-1.38-.89 3.7 3.7 0 0 1-.89-1.38c-.17-.42-.37-1.06-.42-2.23C2.21 15.56 2.2 15.19 2.2 12s0-3.56.07-4.81c.05-1.17.25-1.8.42-2.23.21-.56.47-.96.89-1.38.42-.42.82-.68 1.38-.89.42-.17 1.06-.37 2.23-.42C8.44 2.21 8.81 2.2 12 2.2Zm0 1.98c-3.13 0-3.5.01-4.74.07-1.14.05-1.76.24-2.17.4-.55.21-.94.47-1.35.88-.41.41-.67.8-.88 1.35-.16.41-.35 1.03-.4 2.17-.06 1.24-.07 1.61-.07 4.74s.01 3.5.07 4.74c.05 1.14.24 1.76.4 2.17.21.55.47.94.88 1.35.41.41.8.67 1.35.88.41.16 1.03.35 2.17.4 1.24.06 1.61.07 4.74.07s3.5-.01 4.74-.07c1.14-.05 1.76-.24 2.17-.4.55-.21.94-.47 1.35-.88.41-.41.67-.8.88-1.35.16-.41.35-1.03.4-2.17.06-1.24.07-1.61.07-4.74s-.01-3.5-.07-4.74c-.05-1.14-.24-1.76-.4-2.17a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.41-.16-1.03-.35-2.17-.4-1.24-.06-1.61-.07-4.74-.07Zm0 3.37a5.45 5.45 0 1 1 0 10.9 5.45 5.45 0 0 1 0-10.9Zm0 8.99a3.54 3.54 0 1 0 0-7.08 3.54 3.54 0 0 0 0 7.08Zm6.94-9.2a1.27 1.27 0 1 1-2.55 0 1.27 1.27 0 0 1 2.55 0Z"/>',
+  twitter:
+    '<path d="M18.9 3h3.3l-7.2 8.2L23.4 21h-6.6l-5.2-6.7L5.7 21H2.4l7.7-8.8L2 3h6.8l4.7 6.2Zm-1.2 16h1.8L7.9 4.8H6Z"/>',
+  youtube:
+    '<path d="M21.6 7.2a2.5 2.5 0 0 0-1.75-1.77C18.3 5 12 5 12 5s-6.3 0-7.85.43A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.75 1.77C5.7 19 12 19 12 19s6.3 0 7.85-.43a2.5 2.5 0 0 0 1.75-1.77A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8ZM10 15.1V8.9l5.2 3.1Z"/>',
+  linkedin:
+    '<path d="M6.94 5.5a1.94 1.94 0 1 1-3.88 0 1.94 1.94 0 0 1 3.88 0ZM3.3 8.9h3.4V21H3.3Zm5.6 0h3.25v1.65h.05a3.56 3.56 0 0 1 3.2-1.76c3.43 0 4.06 2.26 4.06 5.2V21h-3.39v-5.35c0-1.28-.02-2.92-1.78-2.92-1.78 0-2.05 1.39-2.05 2.83V21H8.9Z"/>',
+};
+
+const body = stroked[name] ?? filled[name] ?? '';
+const isStroked = name in stroked;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  id={id}
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill={isStroked ? 'none' : 'currentColor'}
+  stroke={isStroked ? 'currentColor' : 'none'}
+  stroke-width={isStroked ? 1.75 : undefined}
+  stroke-linecap={isStroked ? 'round' : undefined}
+  stroke-linejoin={isStroked ? 'round' : undefined}
+  class={className}
+  aria-hidden="true"
+  focusable="false"
+  set:html={body}
+/>
