@@ -1,0 +1,45 @@
+{
+  "name": "tfm-us",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TFM US — foam and mattress manufacturing. Static site.",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "node scripts/astro-run.mjs dev",
+    "start": "node scripts/astro-run.mjs dev",
+    "build": "node scripts/astro-run.mjs build",
+    "check": "node scripts/astro-run.mjs check",
+    "preview": "node scripts/astro-run.mjs preview",
+    "sync": "node scripts/astro-run.mjs sync",
+    "astro": "node scripts/astro-run.mjs",
+    "setup:wasm": "node scripts/setup-wasm-fallback.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "audit": "npm audit --audit-level=moderate",
+    "postinstall": "node scripts/setup-wasm-fallback.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.2.10"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/sitemap": "^3.7.4",
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.50.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "sharp": "^0.35.4",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.0"
+  },
+  "allowScripts": {
+    "esbuild": true
+  },
+  "overrides": {
+    "rollup": "npm:@rollup/wasm-node@^4.63.1"
+  }
+}

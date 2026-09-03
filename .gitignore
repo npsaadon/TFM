@@ -1,0 +1,26 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# scraped copies of the old WordPress site, kept only as a reference while
+# rebuilding — not part of the deliverable
+_recon/
+.playwright-mcp/
+test-results/
+playwright-report/
+
+# environment — never commit secrets. When the contact form is wired up, its
+# API key belongs in the host's environment settings, not in this repo.
+.env
+.env.*
+!.env.example
+
+# editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
